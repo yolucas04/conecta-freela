@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConectaFreela - Plataforma de Freelancers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+
+  <!-- NAVBAR -->
+  <header class="bg-white shadow-sm border-b sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2 cursor-pointer" onclick="showView('home')">
+        <i class="fa-solid fa-briefcase text-blue-600 text-2xl"></i>
+        <span class="text-xl font-bold text-gray-800">Conecta<span class="text-amber-500">Freela</span></span>
+      </div>
+
+      <nav class="flex items-center gap-4">
+        <button onclick="showView('freelancers')" class="text-sm font-medium text-gray-600 hover:text-blue-600">Buscar Freelancers</button>
+        <button onclick="showView('planos')" class="text-sm font-medium text-gray-600 hover:text-blue-600">Planos</button>
+        <div id="authButtons">
+          <button onclick="showModal('modalLogin')" class="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700">Entrar / Cadastrar</button>
+        </div>
+        <div id="userInfo" class="hidden flex items-center gap-3">
+          <span id="userName" class="text-sm font-bold text-gray-700"></span>
+          <span id="userBadge" class="text-xs px-2 py-0.5 rounded font-bold uppercase"></span>
+          <button onclick="logout()" class="text-xs text-red-500 hover:underline"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- BANNER DE SEGURANÇA (RNF04) -->
+  <div class="bg-amber-100 border-b border-amber-200 text-amber-900 text-xs py-2 px-4 text-center flex items-center justify-center gap-2">
+    <i class="fa-solid fa-shield-halved text-amber-600"></i>
+    <span>Mantenha conversas, pagamentos e entregas na plataforma para contar com a segurança da retenção sob custódia e mediação de disputas.</span>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-6">
+
+    <!-- HOME -->
+    <section id="view-home" class="space-y-6">
+      <div class="bg-blue-600 rounded-2xl p-8 text-white flex flex-col md:flex-row justify-between items-center shadow-lg">
+        <div class="space-y-4 max-w-xl">
+          <h1 class="text-3xl font-extrabold">Contrate os melhores profissionais digitais com total segurança.</h1>
+          <p class="text-blue-100 text-sm">Propostas transparentes, retenção de pagamento e plano de acompanhamento em tempo real.</p>
+          <button onclick="showView('freelancers')" class="bg-white text-blue-600 font-bold px-5 py-2.5 rounded-lg shadow hover:bg-gray-100">Explorar Freelancers</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LISTA DE FREELANCERS (RF05) -->
+    <section id="view-freelancers" class="hidden space-y-6">
+      <h2 class="text-xl font-bold text-gray-800">Freelancers Disponíveis</h2>
+      <div id="freelancersGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+    </section>
+
+    <!-- PLANOS E ASSINATURAS (JWT Planos: Grátis, Médio, Empresa) -->
+    <section id="view-planos" class="hidden space-y-6">
+      <div class="text-center max-w-xl mx-auto space-y-2">
+        <h2 class="text-2xl font-bold text-gray-800">Planos de Assinatura Mensal</h2>
+        <p class="text-sm text-gray-500">Aumente sua visibilidade, obtenha selos exclusivos e tenha acesso a recursos avançados.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Plano Grátis -->
+        <div class="bg-white p-6 rounded-xl border shadow-sm flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-lg text-gray-800">Grátis</h3>
+            <div class="text-2xl font-extrabold text-gray-900 my-2">R$ 0 <span class="text-xs text-gray-400 font-normal">/mês</span></div>
+            <ul class="text-xs text-gray-600 space-y-2 my-4">
+              <li><i class="fa-solid fa-check text-green-500 mr-1"></i> Perfil básico de freelancer</li>
+              <li><i class="fa-solid fa-check text-green-500 mr-1"></i> Envio de propostas padrão</li>
+            </ul>
+          </div>
+          <button onclick="upgradePlan('free')" class="w-full bg-gray-200 text-gray-800 py-2 rounded-lg text-xs font-bold hover:bg-gray-300">Manter Plano</button>
+        </div>
+
+        <!-- Plano Médio -->
+        <div class="bg-white p-6 rounded-xl border-2 border-blue-500 shadow-md flex flex-col justify-between relative">
+          <span class="absolute -top-3 right-4 bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Destaque</span>
+          <div>
+            <h3 class="font-bold text-lg text-blue-600">Médio (Destaque)</h3>
+            <div class="text-2xl font-extrabold text-gray-900 my-2">R$ 19,90 <span class="text-xs text-gray-400 font-normal">/mês</span></div>
+            <ul class="text-xs text-gray-600 space-y-2 my-4">
+              <li><i class="fa-solid fa-check text-green-500 mr-1"></i> <strong>Selo Azul</strong> no perfil</li>
+              <li><i class="fa-solid fa-check text-green-500 mr-1"></i> Prioridade intermediária nas buscas</li>
+              <li><i class="fa-solid fa-check text-green-500 mr-1"></i> Relatórios de propostas</li>
+            </ul>
+          </div>
+          <button onclick="upgradePlan('mid')" class="w-full bg-blue-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-blue-700">Assinar Médio</button>
+        </div>
+
+        <!-- Plano Empresa -->
+        <div class="bg-white p-6 rounded-xl border-2 border-amber-400 shadow-md flex flex-col justify-between relative">
+          <span class="absolute -top-3 right-4 bg-amber-400 text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Empresa</span>
+          <div>
+            <h3 class="font-bold text-lg text-amber-600">Para Empresas</h3>
+            <div class="text-2xl font-extrabold text-gray-900 my-2">R$ 39,90 <span class="text-xs text-gray-400 font-normal">/mês</span></div>
+            <ul class="text-xs text-gray-600 space-y-2 my-4">
+              <li><i class="fa-solid fa-check text-green-500 mr-1"></i> <strong>Selo Dourado Premium</strong></li>
+              <li><i class="fa-solid fa-check text-green-500 mr-1"></i> Máxima prioridade nos resultados</li>
+              <li><i class="fa-solid fa-check text-green-500 mr-1"></i> Suporte prioritário dedicado</li>
+            </ul>
+          </div>
+          <button onclick="upgradePlan('enterprise')" class="w-full bg-amber-500 text-white py-2 rounded-lg text-xs font-bold hover:bg-amber-600">Assinar Empresa</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL LOGIN / CADASTRO -->
+  <div id="modalLogin" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-gray-800">Acessar a Plataforma</h3>
+        <button onclick="hideModal('modalLogin')" class="text-gray-400 hover:text-gray-600">&times;</button>
+      </div>
+      <form onsubmit="handleLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600">E-mail</label>
+          <input type="email" id="loginEmail" required class="w-full border rounded-lg p-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600">Senha</label>
+          <input type="password" id="loginPassword" required class="w-full border rounded-lg p-2 text-sm">
+        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-sm">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT DE INTEGRAÇÃO COM A API -->
+  <script>
+    const API_URL = 'http://localhost:3000/api';
+    let token = localStorage.getItem('token') || null;
+    let currentUser = JSON.parse(localStorage.getItem('user')) || null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateAuthUI();
+      loadFreelancers();
+    });
+
+    function showView(viewName) {
+      ['home', 'freelancers', 'planos'].forEach(v => {
+        document.getElementById(`view-${v}`).classList.add('hidden');
+      });
+      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+    }
+
+    function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          token = data.token;
+          currentUser = data.user;
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(currentUser));
+          updateAuthUI();
+          hideModal('modalLogin');
+          alert('Login realizado com sucesso!');
+        } else {
+          alert(data.error);
+        }
+      } catch (err) {
+        alert('Erro ao conectar com a API.');
+      }
+    }
+
+    function logout() {
+      token = null;
+      currentUser = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      updateAuthUI();
+    }
+
+    function updateAuthUI() {
+      if (currentUser) {
+        document.getElementById('authButtons').classList.add('hidden');
+        document.getElementById('userInfo').classList.remove('hidden');
+        document.getElementById('userName').innerText = currentUser.name;
+        
+        const badgeEl = document.getElementById('userBadge');
+        badgeEl.innerText = currentUser.plan;
+        badgeEl.className = `text-xs px-2 py-0.5 rounded font-bold uppercase ${
+          currentUser.plan === 'enterprise' ? 'bg-amber-100 text-amber-800' :
+          currentUser.plan === 'mid' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'
+        }`;
+      } else {
+        document.getElementById('authButtons').classList.remove('hidden');
+        document.getElementById('userInfo').classList.add('hidden');
+      }
+    }
+
+    async function loadFreelancers() {
+      try {
+        const res = await fetch(`${API_URL}/freelancers`);
+        const freelancers = await res.json();
+        const grid = document.getElementById('freelancersGrid');
+        grid.innerHTML = '';
+
+        freelancers.forEach(f => {
+          const card = document.createElement('div');
+          card.className = `bg-white p-5 rounded-xl border shadow-sm relative flex flex-col justify-between ${
+            f.badge === 'gold' ? 'border-amber-400 border-2' : f.badge === 'blue' ? 'border-blue-400 border-2' : 'border-gray-200'
+          }`;
+
+          const badgeHTML = f.badge === 'gold' ? '<span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full"><i class="fa-solid fa-crown text-amber-500"></i> Selo Dourado</span>' :
+                            f.badge === 'blue' ? '<span class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full"><i class="fa-solid fa-certificate text-blue-500"></i> Selo Azul</span>' : '';
+
+          card.innerHTML = `
+            <div>
+              <div class="flex justify-between items-start mb-2">
+                <h4 class="font-bold text-gray-900">${f.name}</h4>
+                ${badgeHTML}
+              </div>
+              <p class="text-xs text-gray-500 mb-2">${f.bio || 'Sem descrição cadastrada.'}</p>
+            </div>
+            <div class="border-t pt-3 mt-4 flex justify-between items-center">
+              <span class="text-xs font-bold text-gray-700">Média: R$ ${f.hourly_rate || '0.00'}/h</span>
+              <button onclick="alert('Abra a solicitação para iniciar o chat')" class="bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded hover:bg-blue-700">Contatar</button>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Erro ao carregar freelancers:', err);
+      }
+    }
+
+    async function upgradePlan(newPlan) {
+      if (!token) return alert('Você precisa estar logado para alterar seu plano.');
+
+      try {
+        const res = await fetch(`${API_URL}/user/upgrade-plan`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ newPlan })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          token = data.token;
+          currentUser.plan = newPlan;
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(currentUser));
+          updateAuthUI();
+          alert('Plano atualizado com sucesso!');
+        } else {
+          alert(data.error);
+        }
+      } catch (err) {
+        alert('Erro ao processar upgrade de plano.');
+      }
+    }
+  </script>
+</body>
+</html>
